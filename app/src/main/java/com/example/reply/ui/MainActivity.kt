@@ -36,17 +36,24 @@ class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
-        enableEdgeToEdge()
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
-            window.isNavigationBarContrastEnforced = false
-        }
-
         setContent {
             ReplyTheme {
                 val uiState by viewModel.uiState.collectAsStateWithLifecycle()
                 ReplyApp(
                     replyHomeUIState = uiState,
                     onEmailClick = viewModel::setSelectedEmail
+                )
+
+                val adaptiveInfo = currentWindowAdaptiveInfo()
+                val sizeClassText =
+                    "${adaptiveInfo.windowSizeClass.windowWidthSizeClass}\n" +
+                            "${adaptiveInfo.windowSizeClass.windowHeightSizeClass}"
+                Text(
+                    text = sizeClassText,
+                    color = Color.Magenta,
+                    modifier = Modifier.padding(
+                        WindowInsets.safeDrawing.asPaddingValues()
+                    )
                 )
             }
         }
