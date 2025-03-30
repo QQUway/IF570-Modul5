@@ -94,14 +94,40 @@ private fun ReplyNavigationWrapperUI(
 
 
 
+@OptIn(ExperimentalMaterial3AdaptiveApi::class)
 @Composable
 fun ReplyAppContent(
     replyHomeUIState: ReplyHomeUIState,
     onEmailClick: (Email) -> Unit,
 ) {
-    // You will implement an adaptive two-pane layout here.
-    ReplyListPane(
-        replyHomeUIState = replyHomeUIState,
-        onEmailClick = onEmailClick,
+    val navigator = rememberListDetailPaneScaffoldNavigator<Long>()
+
+    BackHandler(navigator.canNavigateBack()) {
+        navigator.navigateBack()
+    }
+
+    ListDetailPaneScaffold(
+        directive = navigator.scaffoldDirective,
+        value = navigator.scaffoldValue,
+        listPane = {
+            AnimatedPane {
+                ReplyListPane(
+                    replyHomeUIState = replyHomeUIState,
+                    onEmailClick = { email ->
+                        onEmailClick(email)
+                        navigator.navigateTo(ListDetailPaneScaffoldRole.Detail, email.id)
+                    }
+                )
+            }
+        },
+        detailPane = {
+            AnimatedPane {
+                if (replyHomeUIState.selectedEmail != null) {
+                    ReplyDetailPane(replyHomeUIState.selectedEmail)
+                }
+            }
+        }
     )
 }
+
+
