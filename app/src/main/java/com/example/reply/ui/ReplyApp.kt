@@ -56,19 +56,23 @@ private fun ReplyNavigationWrapperUI(
         mutableStateOf(ReplyDestination.Inbox)
     }
 
-    // You will implement adaptive navigation here.
-    Column(
-        modifier = Modifier
-            .fillMaxSize()
-            .background(MaterialTheme.colorScheme.inverseOnSurface)
-    ) {
-        Box(modifier = Modifier.weight(1f)) {
-            content()
-        }
+    val windowSize = with(LocalDensity.current) {
+        currentWindowSize().toSize().toDpSize()
+    }
+    val layoutType = if (windowSize.width >= 1200.dp) {
+        NavigationSuiteType.NavigationDrawer
+    } else {
+        NavigationSuiteScaffoldDefaults.calculateFromAdaptiveInfo(
+            currentWindowAdaptiveInfo()
+        )
+    }
 
-        NavigationBar(modifier = Modifier.fillMaxWidth()) {
+
+    NavigationSuiteScaffold(
+        layoutType = layoutType,
+        navigationSuiteItems = {
             ReplyDestination.entries.forEach {
-                NavigationBarItem(
+                item(
                     selected = it == selectedDestination,
                     onClick = { /*TODO update selection*/ },
                     icon = {
@@ -83,8 +87,12 @@ private fun ReplyNavigationWrapperUI(
                 )
             }
         }
+    ) {
+        content()
     }
 }
+
+
 
 @Composable
 fun ReplyAppContent(
